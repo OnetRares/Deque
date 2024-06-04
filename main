@@ -1,0 +1,294 @@
+#include <iostream>
+#include <array>
+#include <vector>
+#include <stdexcept>
+
+template<typename T, int BlockSize = 3>
+class Deque {
+private:
+    std::vector<std::array<T, BlockSize>*> blocks;
+    int blockOffsetFront = BlockSize / 2;
+    int blockOffsetBack = blockOffsetFront;
+    int totalElements = 0;
+
+    void addNewBlockFront() {
+        blocks.insert(blocks.begin(), new std::array<T, BlockSize>());
+        blockOffsetFront = BlockSize;
+    }
+
+    void addNewBlockBack() {
+        blocks.push_back(new std::array<T, BlockSize>());
+        blockOffsetBack = 0;
+    }
+
+public:
+    ~Deque() {
+        clear();
+    }
+
+    void push_back(const T& value) {
+        if (blocks.empty()) {
+            blocks.push_back(new std::array<T, BlockSize>());
+        }
+
+        if (blockOffsetBack == BlockSize) {
+            addNewBlockBack();
+        }
+
+        (*blocks.back())[blockOffsetBack++] = value;
+        ++totalElements;
+    }
+
+    void push_front(const T& value) {
+        if (blocks.empty()) {
+            blocks.push_back(new std::array<T, BlockSize>());
+        }
+
+        if (blockOffsetFront == 0) {
+            addNewBlockFront();
+        }
+
+        (*blocks.front())[--blockOffsetFront] = value;
+        ++totalElements;
+    }
+
+    void pop_back() {
+        if (empty()) {
+            throw std::out_of_range("Deque is empty");
+        }
+
+        if (blockOffsetBack == 0) {
+            delete blocks.back();
+            blocks.pop_back();
+            blockOffsetBack = BlockSize;
+        }
+
+        --blockOffsetBack;
+        --totalElements;
+    }
+
+    void pop_front() {
+        if (empty()) {
+            throw std::out_of_range("Deque is empty");
+        }
+
+        if (blockOffsetFront == BlockSize) {
+            delete blocks.front();
+            blocks.erase(blocks.begin());
+            blockOffsetFront = 0;
+        }
+
+        ++blockOffsetFront;
+        --totalElements;
+    }
+
+    T& front() {
+        if (empty()) {
+            throw std::out_of_range("Deque is empty");
+        }
+
+        return (*blocks.front())[blockOffsetFront];
+    }
+
+    T& back() {
+        if (empty()) {
+            throw std::out_of_range("Deque is empty");
+        }
+
+        return (*blocks.back())[blockOffsetBack - 1];
+    }
+
+    bool empty() const {
+        return totalElements == 0;
+    }
+
+    void clear() {
+        for (auto block : blocks) {
+            delete block;
+        }
+        blocks.clear();
+        blockOffsetFront = blockOffsetBack = BlockSize / 2;
+        totalElements = 0;
+    }
+
+    int size() const {
+        return totalElements;
+    }
+
+    T& operator[](int index) {
+        if (index >= totalElements) {
+            throw std::out_of_range("Index out of range");
+        }
+
+        int block = (blockOffsetFront + index) / BlockSize;
+        int offset = (blockOffsetFront + index) % BlockSize;
+        return (*blocks[block])[offset];
+    }
+
+    void insert(const T& value, int pos) {
+        if (pos > totalElements) {
+            throw std::out_of_range("Position out of range");
+        }
+
+        if (pos == 0) {
+            push_front(value);
+        }
+        else if (pos == totalElements) {
+            push_back(value);
+        }
+        else {
+            push_back(value);
+            for (int i = totalElements - 1; i > pos; --i) {
+                std::swap((*this)[i], (*this)[i - 1]);
+            }
+        }
+    }
+
+    void erase(int pos) {
+        if (pos >= totalElements) {
+            throw std::out_of_range("Position out of range");
+        }
+
+        for (int i = pos; i < totalElements - 1; ++i) {
+            std::swap((*this)[i], (*this)[i + 1]);
+        }
+
+        pop_back();
+    }
+};
+
+void displayMenu() {
+    std::cout << "1. Push Back\n";
+    std::cout << "2. Push Front\n";
+    std::cout << "3. Pop Back\n";
+    std::cout << "4. Pop Front\n";
+    std::cout << "5. Front\n";
+    std::cout << "6. Back\n";
+    std::cout << "7. Empty\n";
+    std::cout << "8. Clear\n";
+    std::cout << "9. Size\n";
+    std::cout << "10. Access by Position\n";
+    std::cout << "11. Insert at Position\n";
+    std::cout << "12. Delete at Position\n";
+    std::cout << "13. Display All\n";
+    std::cout << "14. Exit\n";
+}
+
+template<typename T>
+void displayDeque(Deque<T>& dq) {
+    for (int i = 0; i < dq.size(); ++i) {
+        std::cout << dq[i] << " ";
+    }
+    std::cout << std::endl;
+}
+
+int main() {
+    Deque<int> dq;
+    int choice, value, position;
+    while (true) {
+        displayMenu();
+        std::cin >> choice;
+
+        switch (choice) {
+        case 1:
+            std::cout << "Enter value to push back: ";
+            std::cin >> value;
+            dq.push_back(value);
+            break;
+        case 2:
+            std::cout << "Enter value to push front: ";
+            std::cin >> value;
+            dq.push_front(value);
+            break;
+        case 3:
+            try {
+                dq.pop_back();
+                std::cout << "Popped back element.\n";
+            }
+            catch (const std::out_of_range& e) {
+                std::cout << e.what() << std::endl;
+            }
+            break;
+        case 4:
+            try {
+                dq.pop_front();
+                std::cout << "Popped front element.\n";
+            }
+            catch (const std::out_of_range& e) {
+                std::cout << e.what() << std::endl;
+            }
+            break;
+        case 5:
+            try {
+                std::cout << "Front element: " << dq.front() << std::endl;
+            }
+            catch (const std::out_of_range& e) {
+                std::cout << e.what() << std::endl;
+            }
+            break;
+        case 6:
+            try {
+                std::cout << "Back element: " << dq.back() << std::endl;
+            }
+            catch (const std::out_of_range& e) {
+                std::cout << e.what() << std::endl;
+            }
+            break;
+        case 7:
+            std::cout << "Deque is " << (dq.empty() ? "empty" : "not empty") << std::endl;
+            break;
+        case 8:
+            dq.clear();
+            std::cout << "Cleared deque.\n";
+            break;
+        case 9:
+            std::cout << "Size: " << dq.size() << std::endl;
+            break;
+        case 10:
+            std::cout << "Enter position to access: ";
+            std::cin >> position;
+            try {
+                std::cout << "Element at position " << position << ": " << dq[position] << std::endl;
+            }
+            catch (const std::out_of_range& e) {
+                std::cout << e.what() << std::endl;
+            }
+            break;
+        case 11:
+            std::cout << "Enter position to insert: ";
+            std::cin >> position;
+            std::cout << "Enter value to insert: ";
+            std::cin >> value;
+            try {
+                dq.insert(value, position);
+                std::cout << "Inserted " << value << " at position " << position << ".\n";
+            }
+            catch (const std::out_of_range& e) {
+                std::cout << e.what() << std::endl;
+            }
+            break;
+        case 12:
+            std::cout << "Enter position to delete: ";
+            std::cin >> position;
+            try {
+                dq.erase(position);
+                std::cout << "Deleted element at position " << position << ".\n";
+            }
+            catch (const std::out_of_range& e) {
+                std::cout << e.what() << std::endl;
+            }
+            break;
+        case 13:
+            std::cout << "Deque elements: ";
+            displayDeque(dq);
+            break;
+        case 14:
+            return 0;
+        default:
+            std::cout << "Invalid choice.\n";
+            break;
+        }
+    }
+
+    return 0;
+}
