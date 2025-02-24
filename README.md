@@ -1,6 +1,6 @@
 # 🚀 **Dynamic Deque Implementation in C++**
 
-#📌 **Overview**
+# 📌 **Overview**
 
 This project implements a dynamic deque (double-ended queue) in C++ using a block-based memory allocation strategy. The deque supports operations such as insertion and deletion from both ends, indexed access, and resizing as needed.
 
