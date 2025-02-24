@@ -47,15 +47,15 @@ Accessing an out-of-range index throws an error.
 Invalid positions for insert/delete operations are checked before execution.
 
  **Use the menu to interact with the deque**
- 1. Push Back
- 2. Push Front
- 3. Pop Back
- 4. Pop Front
- 5. Front
- 6. Back
- 7. Empty
- 8. Clear
- 9. Size
+1. Push Back
+2. Push Front
+3. Pop Back
+4. Pop Front
+5. Front
+6. Back
+7. Empty
+8. Clear
+9. Size
 10. Access by Position
 11. Insert at Position
 12. Delete at Position
