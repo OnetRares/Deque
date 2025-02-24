@@ -44,7 +44,7 @@ Accessing an out-of-range index throws an error.
 
 Invalid positions for insert/delete operations are checked before execution.
 
- **Use the menu to interact with the deque**
+1️⃣ **Use the menu to interact with the deque**
 1. Push Back
 2. Push Front
 3. Pop Back
