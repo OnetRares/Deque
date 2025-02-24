@@ -1,6 +1,6 @@
 # Deque
 
-🚀 Dynamic Deque Implementation in C++
+🚀 **Dynamic Deque Implementation in C++**
 
 📌 **Overview**
 
