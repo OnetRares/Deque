@@ -24,7 +24,9 @@ Console-based menu for easy user interaction.
 
 📂 Project Structure
 📦 Deque-Implementation
+
 ├── 📜 main.cpp          # Main program with menu-driven user interface
+
 ├── 📜 README.md         # Project documentation (this file)
 
 🛠️ Technologies Used
